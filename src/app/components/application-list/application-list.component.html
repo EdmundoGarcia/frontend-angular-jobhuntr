@@ -1,0 +1,57 @@
+<div class="overflow-x-auto">
+  <table class="min-w-full table-auto border-collapse border border-gray-300">
+    <thead>
+      <tr class="bg-gray-100">
+        <th class="border px-4 py-2">Role</th>
+        <th class="border px-4 py-2">Company</th>
+        <th class="border px-4 py-2">Contact</th>
+        <th class="border px-4 py-2">Type</th>
+        <th class="border px-4 py-2">Mode</th>
+        <th class="border px-4 py-2">Link</th>
+        <th class="border px-4 py-2">Application Date</th>
+        <th class="border px-4 py-2">Last Reply Date</th>
+        <th class="border px-4 py-2">Status</th>
+        <th class="border px-4 py-2">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let application of applications">
+        <td class="border px-4 py-2">{{ application.role }}</td>
+        <td class="border px-4 py-2">{{ application.company }}</td>
+        <td class="border px-4 py-2">{{ application.contact }}</td>
+        <td class="border px-4 py-2">{{ application.type }}</td>
+        <td class="border px-4 py-2">{{ application.mode }}</td>
+        <td class="border px-4 py-2"><a [href]="application.link" target="_blank">View</a></td>
+        <td class="border px-4 py-2">{{ application.applicationDate }}</td>
+        <td class="border px-4 py-2">{{ application.lastReplyDate || '—' }}</td>
+        <td class="border px-4 py-2">
+          <span [ngClass]="{
+            'bg-blue-500 text-white px-2 py-1 rounded': application.status === 'Applied',
+            'bg-yellow-500 text-black px-2 py-1 rounded': application.status === 'Interviewing',
+            'bg-orange-500 text-white px-2 py-1 rounded': application.status === 'Offer',
+            'bg-gray-500 text-white px-2 py-1 rounded': application.status === 'Ghosted',
+            'bg-red-500 text-white px-2 py-1 rounded': application.status === 'Rejected',
+            'bg-green-500 text-white px-2 py-1 rounded': application.status === 'Accepted'
+          }">{{ application.status }}</span>
+        </td>
+        <td class="border px-4 py-2">
+          <button (click)="openModal(application)" class="px-2 py-1 bg-blue-500 text-white rounded">Edit</button>
+          <button (click)="deleteApplication(application.id)" class="px-2 py-1 bg-red-500 text-white rounded ml-2">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="mt-4 text-right">
+  <button (click)="openModal()" class="px-4 py-2 bg-green-500 text-white rounded">Add Application</button>
+</div>
+
+<!-- Modal -->
+<app-application-modal
+  [application]="currentApplication"
+  [isModalOpen]="isModalOpen"
+  [statuses]="statuses"
+  (save)="saveApplication($event)"
+  (close)="closeModal()">
+</app-application-modal>
