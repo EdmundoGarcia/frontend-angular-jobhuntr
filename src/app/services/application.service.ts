@@ -1,30 +1,29 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Application } from '../interfaces/applications.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApplicationService {
-  private applications: Application[] = [];
-  private nextId = 1;
+  private apiUrl = 'http://localhost:5000/applications';
 
-  getApplications(): Application[] {
-    return [...this.applications];
+  constructor(private http: HttpClient) {}
+
+  getApplications(): Observable<Application[]> {
+    return this.http.get<Application[]>(this.apiUrl);
   }
 
-  addApplication(application: Application): void {
-    application.id = this.nextId++;
-    this.applications = [...this.applications, application];
+  addApplication(application: Application): Observable<Application> {
+    return this.http.post<Application>(this.apiUrl, application);
   }
 
-  updateApplication(updatedApplication: Application): void {
-    this.applications = this.applications.map(app =>
-      app.id === updatedApplication.id ? updatedApplication : app
-    );
+  updateApplication(application: Application): Observable<Application> {
+    return this.http.put<Application>(`${this.apiUrl}/${application.id}`, application);
   }
 
-  deleteApplication(applicationId: number): void {
-    this.applications = this.applications.filter(app => app.id !== applicationId);
+  deleteApplication(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
-  constructor() { }
 }

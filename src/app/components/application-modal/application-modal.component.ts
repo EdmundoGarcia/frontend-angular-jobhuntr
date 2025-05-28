@@ -10,6 +10,8 @@ export class ApplicationModalComponent {
   @Input() application!: Application;
   @Input() isModalOpen = false;
   @Input() statuses: string[] = [];
+  @Input() modalTitle: string = 'Add Application';
+
 
   @Output() save = new EventEmitter<Application>();
   @Output() close = new EventEmitter<void>();

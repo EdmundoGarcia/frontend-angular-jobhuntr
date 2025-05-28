@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Application } from 'src/app/interfaces/applications.interface';
 import { ApplicationService } from 'src/app/services/application.service';
+import { Application } from 'src/app/interfaces/applications.interface';
 
 @Component({
   selector: 'app-application-list',
@@ -13,47 +13,69 @@ export class ApplicationListComponent implements OnInit {
   isModalOpen = false;
   isEditing = false;
   currentApplication!: Application;
+  modalTitle: string = 'Add Application'; // Added variable for modal title
 
   constructor(private applicationService: ApplicationService) {}
 
   ngOnInit() {
-    this.applications = this.applicationService.getApplications();
+    this.fetchApplications();
+  }
+
+  fetchApplications() {
+    this.applicationService.getApplications().subscribe(apps => {
+      this.applications = apps;
+    });
   }
 
   openModal(application?: Application) {
-  this.currentApplication = application ? { ...application } : {
-    id: 0,
-    role: '',
-    company: '',
-    contact: '',
-    type: '',
-    mode: '',
-    link: '',
-    applicationDate: '',
-    lastReplyDate: '',
-    status: 'Applied'
-  };
-  this.isEditing = !!application;
-  this.isModalOpen = true;
-}
-
-saveApplication(application: Application) {
-  if (this.isEditing) {
-    this.applicationService.updateApplication(application);
-  } else {
-    this.applicationService.addApplication(application);
+    if (application) {
+        this.modalTitle = 'Edit Application';
+        this.currentApplication = { ...application };
+        this.isEditing = true;
+    } else {
+        this.modalTitle = 'Add Application';
+        const nextId = this.applications.length 
+            ? Math.max(...this.applications.map(app => app.id)) + 1 
+            : 1;
+        this.currentApplication = {
+            id: nextId,
+            role: '',
+            company: '',
+            contact: '',
+            type: '',
+            mode: '',
+            link: '',
+            applicationDate: '',
+            lastReplyDate: '',
+            status: 'Applied'
+        };
+        this.isEditing = false;
+    }
+    this.isModalOpen = true;
   }
-  this.applications = this.applicationService.getApplications();
-  this.closeModal();
-}
 
-closeModal() {
-  this.isModalOpen = false;
-}
+  closeModal() {
+    this.isModalOpen = false;
+  }
 
+  saveApplication() {
+    if (this.isEditing) {
+      this.applicationService.updateApplication(this.currentApplication).subscribe(() => {
+        this.fetchApplications();
+      });
+    } else {
+      this.applicationService.addApplication(this.currentApplication).subscribe(() => {
+        this.fetchApplications();
+      });
+    }
+    this.closeModal();
+  }
 
   deleteApplication(applicationId: number) {
-    this.applicationService.deleteApplication(applicationId);
-    this.applications = this.applicationService.getApplications();
+    if (confirm('Are you sure you want to delete this application?')) {
+      this.applicationService.deleteApplication(applicationId).subscribe(() => {
+        this.fetchApplications();
+      });
+    }
   }
 }

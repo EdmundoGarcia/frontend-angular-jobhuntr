@@ -52,6 +52,7 @@
   [application]="currentApplication"
   [isModalOpen]="isModalOpen"
   [statuses]="statuses"
-  (save)="saveApplication($event)"
+  [modalTitle]="modalTitle"
+  (save)="saveApplication()"
   (close)="closeModal()">
 </app-application-modal>
